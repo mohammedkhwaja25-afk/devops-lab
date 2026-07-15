@@ -9,6 +9,17 @@ pipeline {
             }
         }
 
+        stage('Run Tests') {
+            steps {
+                sh '''
+                python3 -m venv .venv
+                . .venv/bin/activate
+                pip install -r requirements.txt
+                python -m pytest
+                '''
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t devops-lab:v1 .'
@@ -29,9 +40,9 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker tag devops-lab:v1 mohammedkhaja25/devops-lab:v1
-                        docker push mohammedkhaja25/devops-lab:v1
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker tag devops-lab:v1 mohammedkhaja25/devops-lab:v1
+                    docker push mohammedkhaja25/devops-lab:v1
                     '''
                 }
             }
