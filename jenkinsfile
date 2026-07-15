@@ -21,9 +21,19 @@ pipeline {
             }
         }
 
-        stage('List Images') {
+        stage('Push to Docker Hub') {
             steps {
-                sh 'docker images'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker tag devops-lab:v1 mohammedkhaja25/devops-lab:v1
+                        docker push mohammedkhaja25/devops-lab:v1
+                    '''
+                }
             }
         }
     }
